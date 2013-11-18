@@ -35,7 +35,7 @@ public class Game {
 			new Game().startGame();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		} 
 	}
 	
 	/** Regular game window  */
