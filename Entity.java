@@ -74,6 +74,18 @@ public class Entity {
 		this.z = z;
 	}
 	
+	public float getX(){
+		return x;
+	}
+	
+	public float getY(){
+		return y;
+	}
+	
+	public float getZ(){
+		return z;
+	}
+	
 	public void moveForward(){
 		x -= (float) (speed*(Math.sin(Math.toRadians(rotationY))));
 		z += (float) (speed*(Math.cos(Math.toRadians(rotationY))));
@@ -107,31 +119,45 @@ public class Entity {
 		/* Left = False : Right = True*/
 		boolean side = (x - (int)x) + (z - (int)z) < -1;
 		
-		if(-(int)x > 1 && -(int)z > 1){
-			int a = -Game.world.getWorld()[Game.world.getWorld().length+(int)x][Game.world.getWorld()[0].length+(int)z-1];//Bottom_Left
-			int b = -Game.world.getWorld()[Game.world.getWorld()[0].length+(int)z-1][Game.world.getWorld()[0].length+(int)z];//Top_Right
+		double x0 = x;
+		double z0 = z;
+		
+		if(-(int)x0-1 >= 0 && -(int)x0 < Game.world.getWorld().length && -(int)z0-1 >= 0 && -(int)z0 < Game.world.getWorld()[0].length){
+			int a = -Game.world.getWorld()[-(int)x0][-(int)z0-1];//Bottom_Left
+			int b = -Game.world.getWorld()[-(int)x0-1][-(int)z0];//Top_Right
 			int c;//Top_Left / Bottom_Right  <-- has two outputs depends on triangle
 			
-			double x1 = (Game.world.getWorld().length+x) + (int)x;
-			double z1 = (Game.world.getWorld().length+z) + (int)z;
+			double x1 = -(x0 - (int)x0);
+			double z1 = -(z0 - (int)z0);
 			
-			//if(side){//Høyre side
-				c = -Game.world.getWorld()[Game.world.getWorld().length+(int)x][Game.world.getWorld()[0].length+(int)z];
-				y = (c-38)*Game.blockHeight-height;
-			/*}else{
-				point_2 = Game.world.getWorld()[-(int)x+1][-(int)z+1];
-				System.out.println("LEFT: " + point_1);*/
-				y = (float)(b*Game.blockHeight-height - (c-a)*(Game.blockHeight*x1) - (c-b)*(Game.blockHeight*z1));
-			//}
+			if(side){//Høyre side
+				c = -Game.world.getWorld()[-(int)x0-1][-(int)z0-1];
+				y = (float) ((b-(((c-(1-x1)*2*(c-a))-(c+(1-z1)*2*(c-b))))/2))*Game.blockHeight-height;
+				System.out.println(side);
+			}else{
+				c = -Game.world.getWorld()[-(int)x0][-(int)z0];
+				y = (float) ((b+(((c+(1-z1)*2*(a-c))-(c-(1-x1)*2*(b-c))))/2))*Game.blockHeight-height;
+				System.out.println(side);
+			}
+			
+			/* Z
+			if(side){//Høyre side
+				c = -Game.world.getWorld()[-(int)x0-1][-(int)z0-1];
+				y = (float) ((b+(((c-(1-x1)*2*(c-a))-(c-(1-z1)*2*(c-b))))/2))*Game.blockHeight-height;
+				System.out.println(side);
+			}else{
+				c = -Game.world.getWorld()[-(int)x0][-(int)z0];
+				y = (float) ((b-(((c-(1-z1)*2*(a-c))-(c-(1-x1)*2*(b-c))))/2))*Game.blockHeight-height;
+				System.out.println(side);
+			}*/
 			
 			//System.out.println(-(int)x + ", " + -(int)z + " : " + point_1 + " :" + point_2 + " : " + point_3);*/			
 			//System.out.println(z1);
 			//System.out.println((int)x + " : " + (int)y + " : " + (int)z);
-			System.out.println(y);
 
 		}
 		
-		y = -Game.world.getWorld()[Math.round(-x)>=0&&Math.round(-x)<Game.world.getWorld().length?Math.round(-x):0][Math.round(-z)>=0&&Math.round(-z)<Game.world.getWorld()[0].length?Math.round(-z):0]*0.25F-height;
+		//y = -Game.world.getWorld()[Math.round(-x)>=0&&Math.round(-x)<Game.world.getWorld().length?Math.round(-x):0][Math.round(-z)>=0&&Math.round(-z)<Game.world.getWorld()[0].length?Math.round(-z):0]*0.25F-height;
 	}
 	
 	/** Pixels on screen, not degrees! */
