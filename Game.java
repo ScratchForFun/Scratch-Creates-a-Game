@@ -35,7 +35,7 @@ public class Game {
 			new Game().startGame();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 	
 	/** Regular game window  */
@@ -99,7 +99,7 @@ public class Game {
 	public static World world;
 	
 	public void gameLoop(){
-		world = new World(50);
+		world = new World(100);
 	
 		world.generate();
 		world.addPlayer(new Player(70, (float)Display.getWidth()/(float)Display.getHeight(), 0.3F, 1000, 0.1F, world.getWorld().length, world.getWorld()[0].length));
@@ -135,53 +135,91 @@ public class Game {
 			glPushMatrix();
 				for(int x = 0; x < world.getWorld().length; x++){
 					for(int z = 0; z < world.getWorld()[0].length; z++){
-						glTranslatef(x, -world.getWorld()[x][z]*blockHeight, z);
+						glTranslatef(x, world.getWorld()[x][z]*blockHeight, z);
 						
-						if(-(int)world.getWorld()[x][z]*blockHeight <= 10){
-							glDisable(GL_COLOR_MATERIAL);
+						glDisable(GL_COLOR_MATERIAL);
+						glColor4f(0f, 0.7f, 0f, 1f);
+						
+						/* First Triangle */
+						world.getTexture1(x, z).bind();
+						glBegin(GL_TRIANGLES);  // draw a cube with 12 triangles
+							glTexCoord2f(0, 0);
+							glVertex3f(0, 0, 0);
+								
+							glTexCoord2f(1, 0);
+							if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] > world.getWorld()[x][z]) glVertex3f(1, 1*blockHeight, 0);
+							else if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] < world.getWorld()[x][z]) glVertex3f(1, -1*blockHeight, 0);
+							else glVertex3f(1, 0*blockHeight, 0);
 							
-							/* First Triangle */
-							world.getTexture1(x, z).bind();
-							glBegin(GL_TRIANGLES);  // draw a cube with 12 triangles
-								glTexCoord2f(0, 0);
+							glTexCoord2f(0, 1);
+							if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] > world.getWorld()[x][z]) glVertex3f(0, 1*blockHeight, 1);
+							else if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] < world.getWorld()[x][z]) glVertex3f(0,-1*blockHeight, 1);
+							else glVertex3f(0, 0*blockHeight, 1);
+						glEnd();
+						
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+						
+						/* Second Triangle */
+						world.getTexture2(x, z).bind();
+						glBegin(GL_TRIANGLES);  // draw a cube with 12 triangles
+							glTexCoord2f(1, 0);
+							if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] > world.getWorld()[x][z]) glVertex3f(1, 1*blockHeight, 0);
+							else if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] < world.getWorld()[x][z]) glVertex3f(1,-1*blockHeight, 0);
+							else glVertex3f(1, 0*blockHeight, 0);
+
+							glTexCoord2f(0, 1);
+							if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] > world.getWorld()[x][z]) glVertex3f(0, 1*blockHeight, 1);
+							else if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] < world.getWorld()[x][z]) glVertex3f(0,-1*blockHeight, 1);
+							else glVertex3f(0, 0*blockHeight, 1);
+
+							glTexCoord2f(0, 0);
+							if(x+1 < world.getWorld().length && z+1 < world.getWorld()[0].length && world.getWorld()[x+1][z+1] == world.getWorld()[x][z]+2) glVertex3f(1, 2*blockHeight, 1);
+							else if(x+1 < world.getWorld().length && z+1 < world.getWorld()[0].length && world.getWorld()[x+1][z+1] == world.getWorld()[x][z]+1) glVertex3f(1, 1*blockHeight, 1);
+							else if(x+1 < world.getWorld().length && z+1 < world.getWorld()[0].length && world.getWorld()[x+1][z+1] == world.getWorld()[x][z]-1) glVertex3f(1,-1*blockHeight, 1);
+							else if(x+1 < world.getWorld().length && z+1 < world.getWorld()[0].length && world.getWorld()[x+1][z+1] == world.getWorld()[x][z]-2) glVertex3f(1,-2*blockHeight, 1);
+							else glVertex3f(1, 0*blockHeight, 1);
+						glEnd();
+						
+						int range = 20;
+						if((float)(-Math.sqrt((-x-world.getPlayer().getX())*(-x-world.getPlayer().getX())+(-z-world.getPlayer().getZ())*(-z-world.getPlayer().getZ()))+range)/range > 0){
+							glEnable(GL_COLOR_MATERIAL);
+							glColor3f(0f, 0.827f, 0.165F);
+							glDisable(GL_TEXTURE_2D);
+							glTranslatef(0, -0.01F, 0);
+							glBegin(GL11.GL_LINES);
+								glLineWidth(5.0F);
+							
 								glVertex3f(0, 0, 0);
 									
-								glTexCoord2f(1, 0);
-								if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] > world.getWorld()[x][z]) glVertex3f(1,-1*blockHeight, 0);
-								else if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] < world.getWorld()[x][z]) glVertex3f(1, 1*blockHeight, 0);
-								else glVertex3f(1, 0*blockHeight, 0);
+								if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] > world.getWorld()[x][z]){
+									glVertex3f(1, 1*blockHeight, 0);
+									glVertex3f(1, 1*blockHeight, 0);
+								} else if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] < world.getWorld()[x][z]){
+									glVertex3f(1,-1*blockHeight, 0); 
+									glVertex3f(1,-1*blockHeight, 0);
+								} else {
+									glVertex3f(1, 0*blockHeight, 0); 
+									glVertex3f(1, 0*blockHeight, 0);
+								}
 								
-								glTexCoord2f(0, 1);
-								if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] > world.getWorld()[x][z]) glVertex3f(0,-1*blockHeight, 1);
-								else if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] < world.getWorld()[x][z]) glVertex3f(0, 1*blockHeight, 1);
-								else glVertex3f(0, 0*blockHeight, 1);
+								if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] > world.getWorld()[x][z]){
+									glVertex3f(0, 1*blockHeight, 1);
+									glVertex3f(0, 1*blockHeight, 1);
+								} else if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] < world.getWorld()[x][z]){
+									glVertex3f(0,-1*blockHeight, 1);
+									glVertex3f(0,-1*blockHeight, 1);
+								} else {
+									glVertex3f(0, 0*blockHeight, 1);
+									glVertex3f(0, 0*blockHeight, 1);
+								}
+								
+								glVertex3f(0, 0, 0);
 							glEnd();
+							glTranslatef(0, 0.01F, 0);
+							glEnable(GL_TEXTURE_2D);
 							
-							glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-							
-							/* Second Triangle */
-							world.getTexture2(x, z).bind();
-							glBegin(GL_TRIANGLES);  // draw a cube with 12 triangles
-								glTexCoord2f(1, 0);
-								if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] > world.getWorld()[x][z]) glVertex3f(1,-1*blockHeight, 0);
-								else if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] < world.getWorld()[x][z]) glVertex3f(1, 1*blockHeight, 0);
-								else glVertex3f(1, 0*blockHeight, 0);
-	
-								glTexCoord2f(0, 1);
-								if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] > world.getWorld()[x][z]) glVertex3f(0,-1*blockHeight, 1);
-								else if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] < world.getWorld()[x][z]) glVertex3f(0, 1*blockHeight, 1);
-								else glVertex3f(0, 0*blockHeight, 1);
-	
-								glTexCoord2f(0, 0);
-								if(x+1 < world.getWorld().length && z+1 < world.getWorld()[0].length && world.getWorld()[x+1][z+1] == world.getWorld()[x][z]+2) glVertex3f(1,-2*blockHeight, 1);
-								else if(x+1 < world.getWorld().length && z+1 < world.getWorld()[0].length && world.getWorld()[x+1][z+1] == world.getWorld()[x][z]+1) glVertex3f(1,-1*blockHeight, 1);
-								else if(x+1 < world.getWorld().length && z+1 < world.getWorld()[0].length && world.getWorld()[x+1][z+1] == world.getWorld()[x][z]-1) glVertex3f(1, 1*blockHeight, 1);
-								else if(x+1 < world.getWorld().length && z+1 < world.getWorld()[0].length && world.getWorld()[x+1][z+1] == world.getWorld()[x][z]-2) glVertex3f(1, 2*blockHeight, 1);
-								else glVertex3f(1, 0*blockHeight, 1);
-							glEnd();
-							
-							//glEnable(GL_COLOR_MATERIAL);
-							glColor3f(0f, 0.71372549019607843137254901960784f, 0f);
+							glEnable(GL_COLOR_MATERIAL);
+							glColor4f(0f, 0.7f, 0f, (float)(-Math.sqrt((-x-world.getPlayer().getX())*(-x-world.getPlayer().getX())+(-z-world.getPlayer().getZ())*(-z-world.getPlayer().getZ()))+range)/range);
 							glDisable(GL_TEXTURE_2D);
 							glTranslatef(0, 0.01F, 0);
 							glBegin(GL11.GL_LINES);
@@ -190,22 +228,22 @@ public class Game {
 								glVertex3f(0, 0, 0);
 									
 								if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] > world.getWorld()[x][z]){
-									glVertex3f(1,-1*blockHeight, 0);
-									glVertex3f(1,-1*blockHeight, 0);
-								} else if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] < world.getWorld()[x][z]){
-									glVertex3f(1, 1*blockHeight, 0); 
 									glVertex3f(1, 1*blockHeight, 0);
+									glVertex3f(1, 1*blockHeight, 0);
+								} else if(x+1 < world.getWorld().length && world.getWorld()[x+1][z] < world.getWorld()[x][z]){
+									glVertex3f(1,-1*blockHeight, 0); 
+									glVertex3f(1,-1*blockHeight, 0);
 								} else {
 									glVertex3f(1, 0*blockHeight, 0); 
 									glVertex3f(1, 0*blockHeight, 0);
 								}
 								
 								if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] > world.getWorld()[x][z]){
-									glVertex3f(0,-1*blockHeight, 1);
-									glVertex3f(0,-1*blockHeight, 1);
+									glVertex3f(0, 1*blockHeight, 1);
+									glVertex3f(0, 1*blockHeight, 1);
 								} else if(z+1 < world.getWorld()[0].length && world.getWorld()[x][z+1] < world.getWorld()[x][z]){
-									glVertex3f(0, 1*blockHeight, 1);
-									glVertex3f(0, 1*blockHeight, 1);
+									glVertex3f(0,-1*blockHeight, 1);
+									glVertex3f(0,-1*blockHeight, 1);
 								} else {
 									glVertex3f(0, 0*blockHeight, 1);
 									glVertex3f(0, 0*blockHeight, 1);
@@ -216,9 +254,9 @@ public class Game {
 							glTranslatef(0, -0.01F, 0);
 							glEnable(GL_TEXTURE_2D);
 						}
-							
-						glTranslatef(-x, world.getWorld()[x][z]*blockHeight, -z);						
-					}
+					
+						glTranslatef(-x, -world.getWorld()[x][z]*blockHeight, -z);		
+					}			
 				}
 				/*
 				///
