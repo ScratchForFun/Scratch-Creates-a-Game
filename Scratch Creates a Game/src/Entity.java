@@ -130,7 +130,7 @@ public class Entity {
 			double x1 = -(x0 - (int)x0);
 			double z1 = -(z0 - (int)z0);
 			
-			if(side){//HÃ¸yre side
+			if(side){//Høyre side
 				c = -Game.world.getWorld()[-(int)x0-1][-(int)z0-1];
 				y = (float) ((b-(((c-(1-x1)*2*(c-a))-(c+(1-z1)*2*(c-b))))/2))*Game.blockHeight-height;
 				System.out.println(side);
@@ -141,7 +141,7 @@ public class Entity {
 			}
 			
 			/* Z
-			if(side){//HÃ¸yre side
+			if(side){//Høyre side
 				c = -Game.world.getWorld()[-(int)x0-1][-(int)z0-1];
 				y = (float) ((b+(((c-(1-x1)*2*(c-a))-(c-(1-z1)*2*(c-b))))/2))*Game.blockHeight-height;
 				System.out.println(side);
